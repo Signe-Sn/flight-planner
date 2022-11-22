@@ -1,4 +1,4 @@
-package io.codelex.flightplanner.flights;
+package io.codelex.flightplanner.domain;
 
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +9,6 @@ import java.util.List;
 public class FlightRepository {
 
     private List<Flight> flightRepository = new ArrayList<>();
-
 
     public FlightRepository() {
     }

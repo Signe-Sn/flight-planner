@@ -1,4 +1,4 @@
-package io.codelex.flightplanner.flights;
+package io.codelex.flightplanner.domain;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;

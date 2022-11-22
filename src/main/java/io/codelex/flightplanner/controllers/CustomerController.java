@@ -1,10 +1,10 @@
 package io.codelex.flightplanner.controllers;
 
-import io.codelex.flightplanner.customer.CustomerService;
-import io.codelex.flightplanner.customer.PageResult;
-import io.codelex.flightplanner.customer.SearchFlightsRequest;
-import io.codelex.flightplanner.flights.Airport;
-import io.codelex.flightplanner.flights.Flight;
+import io.codelex.flightplanner.domain.Airport;
+import io.codelex.flightplanner.domain.Flight;
+import io.codelex.flightplanner.domain.FlightService;
+import io.codelex.flightplanner.dto.PageResult;
+import io.codelex.flightplanner.dto.SearchFlightsRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,24 +14,25 @@ import java.util.List;
 @RequestMapping("/api")
 public class CustomerController {
 
-    CustomerService customerService;
+    private FlightService flightService;
 
-    public CustomerController(CustomerService customerService) {
-        this.customerService = customerService;
+    public CustomerController(FlightService flightService) {
+        this.flightService = flightService;
     }
 
     @GetMapping("/airports")
     public List<Airport> searchAirports(@RequestParam String search) {
-        return customerService.searchAirports(search);
+        return flightService.searchAirports(search);
     }
 
     @PostMapping("/flights/search")
     public synchronized PageResult<Flight> searchFlights(@Valid @RequestBody SearchFlightsRequest searchFlightsRequest) {
-        return customerService.searchFlights(searchFlightsRequest);
+        return flightService.searchFlights(searchFlightsRequest);
     }
+
 
     @GetMapping("/flights/{id}")
     public Flight findFlightById(@PathVariable long id) {
-        return customerService.findFlightById(id);
+        return flightService.fetchFlight(id);
     }
 }

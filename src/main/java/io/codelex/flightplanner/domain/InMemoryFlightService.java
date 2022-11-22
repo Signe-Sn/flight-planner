@@ -1,8 +1,8 @@
-package io.codelex.flightplanner.flights;
+package io.codelex.flightplanner.domain;
 
-import io.codelex.flightplanner.configuration.Formatting;
-import io.codelex.flightplanner.customer.PageResult;
-import io.codelex.flightplanner.customer.SearchFlightsRequest;
+import io.codelex.flightplanner.dto.PageResult;
+import io.codelex.flightplanner.dto.SearchFlightsRequest;
+import io.codelex.flightplanner.utility.Formatting;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.List;
 public class InMemoryFlightService implements FlightService {
 
     private long idCounter = 0;
-    FlightRepository flightRepository;
+    private FlightRepository flightRepository;
 
     public InMemoryFlightService(FlightRepository flightRepository) {
         this.flightRepository = flightRepository;
@@ -31,7 +31,7 @@ public class InMemoryFlightService implements FlightService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
-        if (isStrangeDates(flight)) {
+        if (isWrongDates(flight)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         }
 
@@ -40,15 +40,13 @@ public class InMemoryFlightService implements FlightService {
         return flight;
     }
 
-    @Override
-    public boolean isSameFlight(Flight flight) {
+    private boolean isSameFlight(Flight flight) {
         return flightRepository.getFlightRepository()
                 .stream()
                 .anyMatch(a -> a.equals(flight));
     }
 
-    @Override
-    public boolean isSameAirport(Flight flight) {
+    private boolean isSameAirport(Flight flight) {
         return (flight.getFrom().equals(flight.getTo()))
                 || flight.getFrom().getAirport().equalsIgnoreCase(flight.getTo().getAirport())
                 && flight.getFrom().getCity().equalsIgnoreCase(flight.getTo().getCity())
@@ -56,21 +54,27 @@ public class InMemoryFlightService implements FlightService {
                 || flight.getFrom().getAirport().equals(flight.getTo().getAirport().trim());
     }
 
-    @Override
-    public boolean isStrangeDates(Flight flight) {
+    public void deleteFlight(long id) {
+        flightRepository.deleteFlight(id);
+    }
+
+    private boolean isWrongDates(Flight flight) {
         return (flight.getArrivalTime().isBefore(flight.getDepartureTime())
                 || flight.getDepartureTime().isEqual(flight.getArrivalTime()));
     }
 
     @Override
     public PageResult<Flight> searchFlights(SearchFlightsRequest searchFlightsRequest) {
-        List<Flight> list = flightRepository.getFlightRepository()
-                .stream()
-                .filter(flight -> flight.getFrom().getAirport().equals(searchFlightsRequest.getFrom())
-                        && flight.getTo().getAirport().equals(searchFlightsRequest.getTo())
-                        && flight.getDepartureTime().toLocalDate().isEqual(Formatting.formatDate(searchFlightsRequest.getDepartureDate())))
-                .toList();
-        return new PageResult<>(list.size() / 15, list.size(), list);
+        if (!searchFlightsRequest.getFrom().equalsIgnoreCase(searchFlightsRequest.getTo())) {
+            List<Flight> list = flightRepository.getFlightRepository()
+                    .stream()
+                    .filter(flight -> flight.getFrom().getAirport().equals(searchFlightsRequest.getFrom())
+                            && flight.getTo().getAirport().equals(searchFlightsRequest.getTo())
+                            && flight.getDepartureTime().toLocalDate().isEqual(Formatting.formatDate(searchFlightsRequest.getDepartureDate())))
+                    .toList();
+            return new PageResult<>(list.size() / 15, list.size(), list);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
     @Override
@@ -91,6 +95,10 @@ public class InMemoryFlightService implements FlightService {
                 .filter(a -> a.getId() == id)
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    public void clear() {
+        flightRepository.clear();
     }
 }
 

@@ -1,4 +1,4 @@
-package io.codelex.flightplanner.configuration;
+package io.codelex.flightplanner.utility;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ public class Formatting {
         return LocalDateTime.parse(localDateTime, formatter);
     }
 
-    public static LocalDate formatDate(String localDate){
+    public static LocalDate formatDate(String localDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(localDate, formatter);
     }

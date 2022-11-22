@@ -1,7 +1,7 @@
-package io.codelex.flightplanner.flights;
+package io.codelex.flightplanner.domain;
 
-import io.codelex.flightplanner.customer.PageResult;
-import io.codelex.flightplanner.customer.SearchFlightsRequest;
+import io.codelex.flightplanner.dto.PageResult;
+import io.codelex.flightplanner.dto.SearchFlightsRequest;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +17,7 @@ public class DBFlightService implements FlightService {
     }
 
     @Override
-    public boolean isSameFlight(Flight flight) {
-        return false;
-    }
-
-    @Override
-    public boolean isSameAirport(Flight flight) {
-        return false;
-    }
-
-    @Override
-    public boolean isStrangeDates(Flight flight) {
-        return false;
+    public void deleteFlight(long id) {
     }
 
     @Override
@@ -44,5 +33,9 @@ public class DBFlightService implements FlightService {
     @Override
     public Flight fetchFlight(long id) {
         return null;
+    }
+
+    @Override
+    public void clear() {
     }
 }
