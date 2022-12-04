@@ -14,11 +14,11 @@ import java.util.List;
 @ConditionalOnProperty(prefix = "planner", name = "memory", havingValue = "inmemory")
 public class InMemoryFlightService implements FlightService {
 
-    private long idCounter = 0;
-    private FlightRepository flightRepository;
+    private Long idCounter = 0L;
+    private InMemoryFlightRepository inMemoryFlightRepository;
 
-    public InMemoryFlightService(FlightRepository flightRepository) {
-        this.flightRepository = flightRepository;
+    public InMemoryFlightService(InMemoryFlightRepository inMemoryFlightRepository) {
+        this.inMemoryFlightRepository = inMemoryFlightRepository;
     }
 
     @Override
@@ -36,12 +36,12 @@ public class InMemoryFlightService implements FlightService {
         }
 
         flight.setId(idCounter++);
-        flightRepository.addFlight(flight);
+        inMemoryFlightRepository.addFlight(flight);
         return flight;
     }
 
     private boolean isSameFlight(Flight flight) {
-        return flightRepository.getFlightRepository()
+        return inMemoryFlightRepository.getFlightRepository()
                 .stream()
                 .anyMatch(a -> a.equals(flight));
     }
@@ -55,7 +55,7 @@ public class InMemoryFlightService implements FlightService {
     }
 
     public void deleteFlight(long id) {
-        flightRepository.deleteFlight(id);
+        inMemoryFlightRepository.deleteFlight(id);
     }
 
     private boolean isWrongDates(Flight flight) {
@@ -66,7 +66,7 @@ public class InMemoryFlightService implements FlightService {
     @Override
     public PageResult<Flight> searchFlights(SearchFlightsRequest searchFlightsRequest) {
         if (!searchFlightsRequest.getFrom().equalsIgnoreCase(searchFlightsRequest.getTo())) {
-            List<Flight> list = flightRepository.getFlightRepository()
+            List<Flight> list = inMemoryFlightRepository.getFlightRepository()
                     .stream()
                     .filter(flight -> flight.getFrom().getAirport().equals(searchFlightsRequest.getFrom())
                             && flight.getTo().getAirport().equals(searchFlightsRequest.getTo())
@@ -80,7 +80,7 @@ public class InMemoryFlightService implements FlightService {
     @Override
     public List<Airport> searchAirports(String search) {
         String fixedSearch = search.trim().toLowerCase();
-        return flightRepository.getFlightRepository()
+        return inMemoryFlightRepository.getFlightRepository()
                 .stream()
                 .map(Flight::getFrom)
                 .filter(from -> from.getAirport().toLowerCase().contains(fixedSearch)
@@ -90,7 +90,7 @@ public class InMemoryFlightService implements FlightService {
 
     @Override
     public Flight fetchFlight(long id) {
-        return flightRepository.getFlightRepository()
+        return inMemoryFlightRepository.getFlightRepository()
                 .stream()
                 .filter(a -> a.getId() == id)
                 .findFirst()
@@ -98,7 +98,7 @@ public class InMemoryFlightService implements FlightService {
     }
 
     public void clear() {
-        flightRepository.clear();
+        inMemoryFlightRepository.clear();
     }
 }
 

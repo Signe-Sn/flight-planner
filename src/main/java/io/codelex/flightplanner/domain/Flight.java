@@ -1,27 +1,38 @@
 package io.codelex.flightplanner.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.codelex.flightplanner.utility.Formatting;
 import io.codelex.flightplanner.dto.AddFlightRequest;
+import io.codelex.flightplanner.utility.Formatting;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+@Entity
+@Table(name = "flight")
 public class Flight {
 
-    private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "airport_from")
     private Airport from;
 
+    @ManyToOne
+    @JoinColumn(name = "airport_to")
     private Airport to;
 
     private String carrier;
 
+    @Column(name = "departure_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    LocalDateTime departureTime;
+    private LocalDateTime departureTime;
 
+    @Column(name = "arrival_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    LocalDateTime arrivalTime;
+    private LocalDateTime arrivalTime;
 
     public Flight(AddFlightRequest addFlightRequest) {
         this.from = addFlightRequest.getFrom();
@@ -31,12 +42,11 @@ public class Flight {
         this.arrivalTime = Formatting.formatDateTime(addFlightRequest.getArrivalTime());
     }
 
-    public long getId() {
-        return id;
+    public Flight() {
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public Long getId() {
+        return id;
     }
 
     public Airport getFrom() {
@@ -45,6 +55,14 @@ public class Flight {
 
     public Airport getTo() {
         return to;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCarrier(String carrier) {
+        this.carrier = carrier;
     }
 
     public String getCarrier() {
